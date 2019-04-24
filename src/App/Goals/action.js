@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { baseUrl } from './../../baseurl'
 
-export function getActivityUser(token){
+export function getActivityUser(token, num){
     const headers = {
         'Content-Type': 'application/json',
         'Auth': token
@@ -9,7 +9,7 @@ export function getActivityUser(token){
 
     return{
         type: 'GET_ACTIVITY_USER',
-        payload: axios.get(`${baseUrl}activity/user/1`, {headers})
+        payload: axios.get(`${baseUrl}activity/user/1?num=${num}`, {headers})
             .then(response => {
                 return response
             }).catch((error) => {

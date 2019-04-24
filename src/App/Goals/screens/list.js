@@ -13,14 +13,30 @@ const width = Dimensions.get('window').width
 const height = Dimensions.get('window').height
 
 class ListActivity extends Component{
-    state = {
-        data: {}
+    constructor(props){
+        super(props)
+        this.state = {
+          contentOffsetY: 0,
+          pagenum : 10
+        }
+    }
+
+    onReloadData(){
+        AsyncStorage.getItem('token').then((response) => {
+            this.props.dispatch(getActivityUser(response, this.state.pagenum))
+        })
     }
 
     componentDidMount(){
-        AsyncStorage.getItem('token').then((response) => {
-            this.props.dispatch(getActivityUser(response))
-        })
+        this.onReloadData()
+    }
+    
+    onScroll = ({ nativeEvent }) => {
+        const { contentOffset } = nativeEvent;
+        this.scrollY = contentOffset.y;
+        if(contentOffset.y < 0){
+            this.onReloadData()
+        }
     }
 
     goToDetailGoal(activity_id){
@@ -40,7 +56,7 @@ class ListActivity extends Component{
     render(){
         return(
             <View style={{flex: 1}}>
-                <ScrollView>
+                <ScrollView onScroll={this.onScroll}>
                 <View style={{zIndex: 0, position: 'absolute', width: width, height: 250, overflow: 'hidden', borderBottomLeftRadius: 30, borderBottomRightRadius: 30}}>
                     <ImageBackground source={require('./../../../../assets/BGApp.png')}
                                 style={{width: width, height: 300, resizeMode: 'contain'}}>
@@ -72,7 +88,8 @@ class ListActivity extends Component{
                                                 <Text>{item.title}</Text>
                                             </View>
                                             <View style={{paddingTop: 10}}>
-                                                <Text>{Moment(item.CreatedAt).format('d MMMM YYYY')}</Text>
+                                                <Text>{Moment(item.CreatedAt).format('D MMMM YYYY')}</Text>
+                                                
                                             </View>
                                         </View>
                                         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -98,7 +115,7 @@ class ListActivity extends Component{
     }
 }
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
   return {
       activitiesuser: state.GoalsReducer
   }

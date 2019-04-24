@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import{View, Alert, StyleSheet, Dimensions, Image, ImageBackground, ScrollView, AsyncStorage,TouchableOpacity} from 'react-native'
 
 import {connect} from 'react-redux'
-import {getActivityByUser} from './../action'
+import {getActivityByUser, changeStatus} from './../action'
 
 import {Text, Spinner, Icon, Button
   } from 'native-base'
@@ -15,18 +15,37 @@ class Dashboard extends Component{
         this.props.navigation.navigate('AddActivity')
     }
 
-    changeStatus(status){
-        Alert.alert('Clicked', status);
+    changeStatus(id, status){
+        Alert.alert(
+            'Option', 
+            'Are you sure ?',
+            [
+                {text: 'No'},
+                {text: 'Yes', onPress: () => this._changeStaus(id, status)}
+            ]
+        );
     }
 
-    goToDetailGoal(){
-        this.props.navigation.navigate('ActivityDetail')
+    _changeStaus(id, status){
+        this.props.dispatch(changeStatus(id, status)).then((response) => {
+            this.onReloadData()
+        })
     }
 
-    componentDidMount(){
+    goToDetailGoal(activity_id){
+        this.props.navigation.navigate('ActivityDetail', {
+            activity_id: activity_id
+        })
+    }
+
+    onReloadData(){
         AsyncStorage.getItem('token').then((response) => {
             this.props.dispatch(getActivityByUser(response))
         })
+    }
+
+    componentDidMount(){
+        this.onReloadData()
     }
 
     render(){
@@ -74,12 +93,13 @@ class Dashboard extends Component{
                                       </View>
                                     </View>
                                     <View style={{flexDirection: 'row', paddingTop: 10}}>
+                                        
                                         <View style={{
                                             width: 60,
                                             height: 30,
                                             borderRadius: 20
                                         }}>
-                                        <TouchableOpacity onPress={() => this.changeStatus("Done")}>
+                                        <TouchableOpacity onPress={() => this.changeStatus(item.ID, 1)}>
                                         <Image style={{width: 60, height: 30, resizeMode: 'contain'}} source={require('./../../../../assets/done-home.png')}/>
                                         </TouchableOpacity>
                                         </View>
@@ -89,7 +109,7 @@ class Dashboard extends Component{
                                             borderRadius: 20,
                                             marginLeft: 15
                                         }}>
-                                        <TouchableOpacity key={item.ID} onPress={() => this.changeStatus("Nope")}>
+                                        <TouchableOpacity key={item.ID} onPress={() => this.changeStatus(item.ID, 2)}>
                                         <Image style={{width: 60, height: 30, resizeMode: 'contain'}} source={require('./../../../../assets/nope-home.png')}/>
                                         </TouchableOpacity>
                                         </View>
@@ -100,7 +120,7 @@ class Dashboard extends Component{
                                             height: 30,
                                             borderRadius: 20
                                         }}>
-                                        <TouchableOpacity onPress={() => this.goToDetailGoal()}>
+                                        <TouchableOpacity onPress={() => this.goToDetailGoal(item.ID)}>
                                             <Image style={{width: 135, height: 30, resizeMode: 'contain'}} source={require('./../../../../assets/Check-Goal.png')}/>
                                         </TouchableOpacity>
                                         </View>
@@ -126,7 +146,8 @@ class Dashboard extends Component{
 
 const mapStateToProps = (state)=> {
     return {
-        activities: state.DashboardReducer
+        activities: state.DashboardReducer,
+        changestatus: state.DashboardReducer
     }
 }
 

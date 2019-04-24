@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import { StyleSheet, Text, ScrollView, View, Dimensions, ImageBackground, Image, TouchableOpacity,TouchableHighlight } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, ImageBackground, Image, TouchableOpacity,TouchableHighlight } from 'react-native';
 import {Icon} from 'native-base'
 import Moment from 'moment'
 
 import {connect} from 'react-redux'
-import { getActivityUser ,getActivityById } from '../action'
+import { getActivityById } from '../action'
 
 const width = Dimensions.get('window').width
 const height = Dimensions.get('window').height
@@ -20,7 +20,7 @@ class Goal_detail extends Component{
     }
 
     render(){
-        // const {title, description, complete_activity, CreatedAt, time_end} = this.props.activityUser.data
+        const {title, description, complete_activity, CreatedAt, time_end} = this.props.activity.results
         return(
             <View style={{flex: 1}}>
                 <View style={{zIndex: 0, position: 'absolute', width: width, height: 250, overflow: 'hidden', borderBottomLeftRadius: 30, borderBottomRightRadius: 30}}>
@@ -38,15 +38,15 @@ class Goal_detail extends Component{
                                 </View>
                             </View>
                             <View style={{paddingTop: 30, justifyContent: 'center', alignItems: 'center'}}>
-                                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 20, textAlign: 'center', paddingRight: 30, paddingLeft: 30}}>asasas</Text>
+                                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 20, textAlign: 'center', paddingRight: 30, paddingLeft: 30}}>{title}</Text>
                             </View>
                             <View style={{paddingTop: 40, justifyContent: 'center', alignItems: 'center'}}>
                                 <View style={styles.completeBorder}>
-                                {/* {complete_activity == 1? (
+                                {complete_activity == 1? (
                                     <Text style={{color: 'white', fontSize: 15, textAlign: 'center', paddingTop: 1}}>Complete</Text>
                                 ): (
                                     <Text style={{color: 'white', fontSize: 15, textAlign: 'center', paddingTop: 1}}>Nope</Text>
-                                )} */}
+                                )}
                                 </View>
                             </View>
                         </View>
@@ -55,7 +55,7 @@ class Goal_detail extends Component{
                 <View style={{flex: 1, marginTop: 270, marginLeft: 30, marginRight: 30}}>
                     <View style={{justifyContent: 'center', alignItems: 'center'}}>
                         <Text style={{textAlign: 'center', fontSize: 15}}>
-                            AAAAA
+                            {description}
                         </Text>
                         <View style={{flexDirection: 'row', paddingTop: 20}}>
                             <View>
@@ -63,7 +63,7 @@ class Goal_detail extends Component{
                             </View>
                             <View style={{paddingLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
                                 {/* <Text style={{textAlign: 'center'}}>{Moment(CreatedAt).format('d/M/YYYY')}</Text> */}
-                                <Text style={{textAlign: 'center'}}>ASASAS</Text>
+                                <Text style={{textAlign: 'center'}}>{Moment(CreatedAt).format('d MMMM YYYY')}</Text>
                             </View>
                         </View>
                         <View style={{flexDirection: 'row', paddingTop: 20}}>
@@ -71,7 +71,7 @@ class Goal_detail extends Component{
                                 <Icon name="alarm" style={{color: '#0062a8'}}/>
                             </View>
                             <View style={{paddingLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
-                                <Text style={{textAlign: 'center'}}>asasas</Text>
+                                <Text style={{textAlign: 'center'}}>{time_end}</Text>
                             </View>
                         </View>
                         <TouchableOpacity onPress={() => this.moveBack()}>
@@ -84,11 +84,9 @@ class Goal_detail extends Component{
     }
 }
 
-const mapStateToProps = (state) => {
-  return{
-        activityUser: state.GoalsReducer
-  }
-}
+const mapStateToProps = (state)=>({
+    activity: state.GoalsReducer
+})
 
 export default connect(mapStateToProps)(Goal_detail);
 

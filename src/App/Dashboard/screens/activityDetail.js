@@ -1,14 +1,38 @@
 import React, { Component } from 'react'
-import{View, Alert, StyleSheet, Dimensions, Image, ImageBackground,TouchableOpacity} from 'react-native'
-import {Icon, Text, Content, Item, Input, Form, Label, Textarea} from 'native-base'
+import{View, Alert, StyleSheet, Dimensions, Image, ImageBackground, TouchableOpacity} from 'react-native'
+import {Icon, Text} from 'native-base'
+
+import {connect} from 'react-redux'
+import {getActivityById, changeStatus} from './../action'
 
 const width = Dimensions.get("window").width
 const height = Dimensions.get("window").height
 
 class ActivityDetail extends Component{
+    changeStatusActivity(id, status){
+        Alert.alert(
+            'Option', 
+            'Are you sure ?',
+            [
+                {text: 'No'},
+                {text: 'Yes', onPress: () => this._changeStaus(id, status)}
+            ]
+        )
+    }
 
-    changeStatus(status){
-        Alert.alert('Clicked', status);
+    componentDidMount(){
+        const {activity_id} = this.props.navigation.state.params
+        this.onLoadData(activity_id)
+    }
+
+    _changeStaus(id, status){
+        this.props.dispatch(changeStatus(id, status)).then((response) => {
+            this.props.navigation.push('Dashboard')
+        })
+    }
+
+    onLoadData(activity_id){
+        this.props.dispatch(getActivityById(activity_id))
     }
 
     moveBack(){
@@ -16,8 +40,9 @@ class ActivityDetail extends Component{
     }
 
     render(){
+        const { description, title, time_end, ID } = this.props.activity.result
         return(
-            <View style={{flex: 1}}>
+            <View key={ID} style={{flex: 1}}>
             <View style={{zIndex: 0, position: 'absolute', width: width, height: 250, overflow: 'hidden', borderBottomLeftRadius: 30, borderBottomRightRadius: 30}}>
                 <ImageBackground source={require('./../../../../assets/BGApp.png')}
                                 style={{width: width, height: 300, resizeMode: 'contain'}}>
@@ -33,7 +58,7 @@ class ActivityDetail extends Component{
                             </View>
                         </View>
                         <View style={{paddingTop: 30, justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={{color: 'white', fontWeight: 'bold', fontSize: 20, textAlign: 'center', paddingRight: 30, paddingLeft: 30}}>Goal Title</Text>
+                            <Text style={{color: 'white', fontWeight: 'bold', fontSize: 20, textAlign: 'center', paddingRight: 30, paddingLeft: 30}}>{title}</Text>
                         </View>
                         <View style={{paddingTop: 40, justifyContent: 'center', alignItems: 'center'}}>
                             <View style={{
@@ -59,14 +84,14 @@ class ActivityDetail extends Component{
             <View style={{flex: 1, marginTop: 270, marginLeft: 30, marginRight: 30}}>
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                     <Text style={{textAlign: 'center', fontSize: 15}}>
-                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                        {description}
                     </Text>
                     <View style={{flexDirection: 'row', paddingTop: 10}}>
                         <View>
                             <Icon name="alarm" style={{color: '#0062a8'}}/>
                         </View>
                         <View style={{paddingLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={{textAlign: 'center'}}>14.00</Text>
+                            <Text style={{textAlign: 'center'}}>{time_end}</Text>
                         </View>
                     </View>
                     <View style={{flexDirection: 'row', paddingTop: 10}}>
@@ -75,7 +100,7 @@ class ActivityDetail extends Component{
                             height: 30,
                             borderRadius: 20
                         }}>
-                            <TouchableOpacity onPress={() => this.changeStatus("Done")}>
+                            <TouchableOpacity onPress={() => this.changeStatusActivity(ID, 1)}>
                                 <Image style={{width: 60, height: 30, resizeMode: 'contain'}} source={require('./../../../../assets/done-home.png')}/>
                             </TouchableOpacity>
                         </View>
@@ -85,7 +110,7 @@ class ActivityDetail extends Component{
                            borderRadius: 20,
                             marginLeft: 15
                         }}>
-                         <TouchableOpacity onPress={() => this.changeStatus("Nope")}>
+                         <TouchableOpacity onPress={() => this.changeStatusActivity(ID, 2)}>
                             <Image style={{width: 60, height: 30, resizeMode: 'contain'}} source={require('./../../../../assets/nope-home.png')}/>
                          </TouchableOpacity>
                         </View>
@@ -97,7 +122,12 @@ class ActivityDetail extends Component{
     }
 }
 
-export default ActivityDetail;
+const mapStateToProps = (state) => ({
+    activity: state.DashboardReducer,
+    changeactivity: state.DashboardReducer
+})
+
+export default connect(mapStateToProps)(ActivityDetail);
 
 const styles = StyleSheet.create({
     container: {

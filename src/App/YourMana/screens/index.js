@@ -1,11 +1,26 @@
 import React, { Component } from 'react'
-import { StyleSheet, Text, View, Dimensions, ImageBackground, Image, TouchableHighlight } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, ImageBackground, Image, AsyncStorage } from 'react-native';
+
+import {connect} from 'react-redux'
+import {getCountByUser} from './../action'
+import Moment from 'moment'
 
 const width = Dimensions.get('window').width
 const height = Dimensions.get('window').height
 
 class YourManaList extends Component{
+    
+    componentDidMount(){
+        AsyncStorage.getItem('token').then((response) => {
+            this.props.dispatch(getCountByUser(response))
+        })
+    }
+
     render(){
+        const {success, CreatedAt} = this.props.manalist.results
+        const startDays = Moment(CreatedAt)
+        const lastDays = Moment()
+        const daysCount = Moment(lastDays).diff(startDays, 'days').toString()
         return(
             <View style={{flex: 1}}>
                 <ImageBackground style={{width: width, height: height}} source={require('./../../../../assets/BGApp.png')}>
@@ -24,14 +39,14 @@ class YourManaList extends Component{
                                 fontSize: 30,
                                 fontWeight: 'bold',
                                 color: 'white'
-                            }}>7 Goals</Text>
+                            }}>{success} Goals</Text>
                             <Text style={{
                                 paddingTop: 5,
                                 justifyContent: 'center',
                                 alignContent: 'center',
                                 fontSize: 10,
                                 color: 'grey'
-                            }}>in 3 days</Text>
+                            }}>in {daysCount} days</Text>
                         </View>
                         <View style={{paddingTop: 20}}>
                             <Text style={{fontSize: 25, color: 'white',fontWeight: 'bold', justifyContent: 'center', alignContent: 'center'}}>Good Job!</Text>
@@ -43,7 +58,12 @@ class YourManaList extends Component{
     }
 }
 
-export default YourManaList;
+const mapStateToProps = (state) => ({
+    manalist: state.ManaReducer
+})
+
+
+export default connect(mapStateToProps)(YourManaList);
 
 const styles = StyleSheet.create({
     container: {

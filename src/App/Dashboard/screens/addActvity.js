@@ -1,10 +1,14 @@
 import React, { Component } from 'react'
-import{View, StyleSheet, Dimensions, Image, ImageBackground, ScrollView,TouchableOpacity, TextInput} from 'react-native'
-import {Icon, Text, Content, Item, Input, Form, Label, Textarea} from 'native-base'
+import{View, StyleSheet, Dimensions, Image, Alert, AsyncStorage,ImageBackground, TouchableOpacity} from 'react-native'
+import {Icon, Text, Item, Input, Form, Textarea} from 'native-base'
 import DatePicker from 'react-native-datepicker';
 
+import {connect} from 'react-redux'
+
+import {postActivityByUser} from './../action'
+
 const width = Dimensions.get("window").width
-const height = Dimensions.get("window").height
+
 
 class AddActivity extends Component{
     constructor(props) {
@@ -16,6 +20,38 @@ class AddActivity extends Component{
 
     moveBack(){
         this.props.navigation.goBack(null)   
+    }
+
+    handleCreateActivity(){
+        Alert.alert(
+            'Option',
+            'Are you sure ?',
+            [
+                {text: 'No', onPress: () => this.props.navigation.goBack(null)},
+                {text: 'Yes', onPress: () => this._createdActivity()}
+            ]
+        )
+    }
+
+    _createdActivity(){
+        AsyncStorage.getItem('token').then((response) => {
+            const{date, title, description} = this.state
+            const data = {
+                title: title,
+                description: description,
+                date: date
+            }
+
+            this.props.dispatch(postActivityByUser(response, data)).then((response) => {
+                Alert.alert(
+                    "Success", 
+                    `${this.props.activites.result.title} has been created`,
+                    [
+                        {text: 'Ok', onPress: () => this.props.navigation.push('Dashboard')},
+                    ]
+                )
+            })
+        })
     }
 
     render(){
@@ -45,9 +81,9 @@ class AddActivity extends Component{
                 <View style={{width: width}}>
                     <Form style={{marginLeft: 20, marginRight: 30}}>
                         <Item rounded style={styles.textInputStyle}>
-                            <Input placeholder='Title'/>
+                            <Input placeholder='Title' onChangeText={(title) => this.setState({title})}/>
                         </Item>
-                        <Textarea rowSpan={5} bordered placeholder="Description" style={{
+                        <Textarea onChangeText={(description) => this.setState({description})} rowSpan={5} bordered placeholder="Description" style={{
                             borderRadius: 20,
                             backgroundColor: 'white',
                             shadowColor: 'black',
@@ -62,7 +98,8 @@ class AddActivity extends Component{
                             </View>
                             <DatePicker
                             style={{
-                                width: 300
+                                width: 300,
+                                height: 10
                             }}
                             showIcon={false}
                             date={this.state.date} //initial date from state
@@ -85,12 +122,14 @@ class AddActivity extends Component{
                             onDateChange={(date) => {this.setState({date: date})}}
                             />
                         </View>
-                    </Form>
-                    <View style={{flex: 1,paddingTop: 40}}>
-                        <View style={{justifyContent: 'center', alignItems: 'center', width: width}}>
-                            <Image source={require('./../../../../assets/lets-go.png')} resizeMode='contain' style={{justifyContent: 'center', alignItems: 'center', width: 250, height: 150}}/>
+                        <View style={{flex: 1}}>
+                            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                <TouchableOpacity onPress={() => this.handleCreateActivity()}>
+                                    <Image source={require('./../../../../assets/lets-go.png')} resizeMode='contain' style={{justifyContent: 'center', alignItems: 'center', width: 250, height: 120}}/>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
+                    </Form>
                 </View>
             </View>
             </View>
@@ -98,7 +137,14 @@ class AddActivity extends Component{
     }
 }
 
-export default AddActivity;
+const mapStateToProps = (state) => {
+  return{
+    activites: state.DashboardReducer
+  }
+}
+
+
+export default connect(mapStateToProps)(AddActivity);
 
 const styles = StyleSheet.create({
     container: {
