@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import{View, StyleSheet, Dimensions, Image, ImageBackground,TouchableOpacity, AsyncStorage} from 'react-native'
+import{View, StyleSheet, Dimensions, Image, ImageBackground,TouchableOpacity, AsyncStorage, Alert} from 'react-native'
 import {Icon, Text, Content, Item, Input, Form} from 'native-base'
 import { connect } from 'react-redux'
 const width = Dimensions.get("window").width
@@ -11,13 +11,26 @@ class Edit_profile extends Component{
     constructor(props) {
         super(props);
         this.state = {
-            date: ""
+            email: "",
+            name: "",
+            last_name: ""
         }
+    }
+
+    _updateProfile(){
+        const {email, name, last_name} = this.state
+        Alert.alert("Save", `${email} - ${name} - ${last_name}`)
     }
 
     componentDidMount(){
         AsyncStorage.getItem('token').then((response) => {
             this.props.dispatch(userData(response))
+            const {email, name, last_name} = this.props.profiles.data
+            this.setState({
+                email: email,
+                name: name,
+                last_name: last_name
+            })
         })
     }
 
@@ -27,7 +40,6 @@ class Edit_profile extends Component{
 
     render(){
         const {email, name, last_name} = this.props.profiles.data
-
         return(
             <View style={{flex: 1}}>
             <View style={{zIndex: 0, position: 'absolute', width: width, height: 250, overflow: 'hidden', borderBottomLeftRadius: 30, borderBottomRightRadius: 30}}>
@@ -55,18 +67,20 @@ class Edit_profile extends Component{
                 <View style={{width: width}}>
                     <Form style={{marginLeft: 20, marginRight: 30}}>
                         <Item rounded style={styles.textInputStyle}>
-                            <Input placeholder='Email' value={email}/>
+                            <Input placeholder='Email' value={this.state.email} onChangeText={(email) => this.setState({email})}/>
                         </Item>
                         <Item rounded style={styles.textInputStyle}>
-                            <Input placeholder='First Name' value={name}/>
+                            <Input placeholder='First Name' defaultValue={this.state.name} onChangeText={(name) => this.setState({name})}/>
                         </Item>
                         <Item rounded style={styles.textInputStyle}>
-                            <Input placeholder='Last Name' value={last_name}/>
+                            <Input placeholder='Last Name' defaultValue={this.state.last_name} onChangeText={(last_name) => this.setState({last_name})}/>
                         </Item>
                     </Form>
-                    <View style={{flex: 1,paddingTop: 40}}>
+                    <View style={{flex: 1}}>
                         <View style={{justifyContent: 'center', alignItems: 'center', width: width}}>
-                            <Image source={require('./../../../../assets/Save.png')} resizeMode='contain' style={{justifyContent: 'center', alignItems: 'center', width: 250, height: 150}}/>
+                            <TouchableOpacity onPress={() => this._updateProfile()}>
+                                <Image source={require('./../../../../assets/Save.png')} resizeMode='contain' style={{justifyContent: 'center', alignItems: 'center', width: 250, height: 150}}/>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>

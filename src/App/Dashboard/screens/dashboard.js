@@ -1,15 +1,26 @@
 import React, { Component } from 'react'
-import{View, Alert, StyleSheet, Dimensions, Image, ImageBackground, ScrollView, AsyncStorage,TouchableOpacity} from 'react-native'
+import{View, Alert, StyleSheet, Dimensions, Image, Animated, ImageBackground, ScrollView, AsyncStorage,TouchableOpacity} from 'react-native'
 
 import {connect} from 'react-redux'
 import {getActivityByUser, changeStatus} from './../action'
 
 import {Text, Spinner, Icon, Button
-  } from 'native-base'
+} from 'native-base'
 
 const width = Dimensions.get('window').width
 
+const HEADER_MIN_HEIGHT = 70
+const HEADER_MAX_HEIGHT = 250
+const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT
+
 class Dashboard extends Component{
+    constructor(props) {
+        super(props);
+      
+        this.state = {
+          scrollY: new Animated.Value(0),
+        };
+    }
 
     goToAddGoal(){
         this.props.navigation.navigate('AddActivity')
@@ -48,24 +59,9 @@ class Dashboard extends Component{
         this.onReloadData()
     }
 
-    render(){
+    _renderActivityView(){
         return(
-            <View style={{flex: 1}}>
-            <ScrollView>
-                <View style={{zIndex: 0, position: 'absolute', width: width, height: 250, overflow: 'hidden', borderBottomLeftRadius: 30, borderBottomRightRadius: 30}}>
-                    <ImageBackground source={require('./../../../../assets/BGApp.png')}
-                                style={{width: width, height: 300, resizeMode: 'contain'}}>
-                    <View style={{flex: 1}}>
-                        <View style={{paddingTop: 35, justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={{color: 'white', fontWeight: 'bold', fontSize: 15}}>Home</Text>
-                        </View>
-                        <View style={{paddingTop: 50, justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={{color: 'white', fontWeight: 'bold', fontSize: 30}}>Today's Goals</Text>
-                        </View>
-                    </View>
-                    </ImageBackground>
-                </View>
-                <View style={{flex: 1, marginTop: 200}}>
+            <View style={{flex: 1, marginTop: 200}}>
                     <View style={{alignContent:'center', alignItems: 'center'}}>
                         {this.props.activities.isLoading?(
                             <View key={this.props.activities.isLoading} style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 200}}>
@@ -133,6 +129,61 @@ class Dashboard extends Component{
                         )}
                     </View>
                 </View>
+        )
+    }
+
+    render(){
+        const headerHeight = this.state.scrollY.interpolate({
+            inputRange: [0, HEADER_SCROLL_DISTANCE],
+            outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
+            extrapolate: 'clamp',
+        });
+
+        const headerBorderSize = this.state.scrollY.interpolate({
+            inputRange: [30, HEADER_SCROLL_DISTANCE],
+            outputRange: [30, 0],
+            extrapolate: 'clamp'
+        })
+    
+
+        const headerZindex = this.state.scrollY.interpolate({
+            inputRange: [0, HEADER_SCROLL_DISTANCE, HEADER_SCROLL_DISTANCE],
+            outputRange: [0, 0, 1000],
+            extrapolate: 'clamp'
+        })
+
+        const headerTitleBottom = this.state.scrollY.interpolate({
+            inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT,
+                HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT + 5,
+                HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT + 5
+                + 26
+            ],
+            outputRange: [-20, -20, -20, 0],
+            extrapolate: 'clamp'
+        })
+        
+        return(
+            <View style={{flex: 1}}>
+            <Animated.View style={{zIndex: headerZindex, position: 'absolute', width: width, height: headerHeight, overflow: 'hidden', borderBottomLeftRadius: headerBorderSize, borderBottomRightRadius: headerBorderSize}}>
+                <ImageBackground source={require('./../../../../assets/BGApp.png')}
+                                    style={{width: width, height: 300, resizeMode: 'contain'}}>
+                        <View style={{flex: 1}}>
+                            <Animated.View style={{bottom: headerTitleBottom, paddingTop: 35, justifyContent: 'center', alignItems: 'center'}}>
+                                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 15}}>Home</Text>
+                            </Animated.View>
+                            <View style={{paddingTop: 50, justifyContent: 'center', alignItems: 'center'}}>
+                                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 30}}>Today's Goals</Text>
+                            </View>
+                        </View>
+                </ImageBackground>
+            </Animated.View>
+            <ScrollView
+                scrollEventThrottle={1}
+                onScroll={Animated.event(
+                  [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}]
+                )}
+            >
+            {this._renderActivityView()}
             </ScrollView>
             <View>
             <Button style={styles.fabstyle} onPress={() => this.goToAddGoal()}>

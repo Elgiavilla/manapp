@@ -63,7 +63,7 @@ class Goal_detail extends Component{
                             </View>
                             <View style={{paddingLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
                                 {/* <Text style={{textAlign: 'center'}}>{Moment(CreatedAt).format('d/M/YYYY')}</Text> */}
-                                <Text style={{textAlign: 'center'}}>{Moment(CreatedAt).format('d MMMM YYYY')}</Text>
+                                <Text style={{textAlign: 'center'}}>{Moment(CreatedAt).format('DD MMMM YYYY')}</Text>
                             </View>
                         </View>
                         <View style={{flexDirection: 'row', paddingTop: 20}}>

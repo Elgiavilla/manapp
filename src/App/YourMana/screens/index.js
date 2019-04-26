@@ -11,6 +11,12 @@ const height = Dimensions.get('window').height
 class YourManaList extends Component{
     
     componentDidMount(){
+        this.props.navigation.addListener("didFocus", () => {
+            this.onReloadData()
+        })
+    }
+
+    onReloadData(){
         AsyncStorage.getItem('token').then((response) => {
             this.props.dispatch(getCountByUser(response))
         })

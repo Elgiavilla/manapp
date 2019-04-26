@@ -11,11 +11,11 @@ const AppNavigator = createBottomTabNavigator({
     Dashboard: {
         screen: Dashboard,
         navigationOptions:{
-            tabBarIcon: ({focused, tintColor}) => {
+            tabBarIcon: ({focused}) => {
                 if(focused == true){
-                    return <Image source={require(`./../../assets/home-active.png`)} style={{ height: 22, width: 22, tintColor: tintColor }}/>
+                    return <Image source={require(`./../../assets/home-active.png`)} style={{ height: 22, width: 22 }}/>
                 }else{
-                    return <Image source={require(`./../../assets/home.png`)} style={{ height: 22, width: 22, tintColor: tintColor }}/>
+                    return <Image source={require(`./../../assets/home.png`)} style={{ height: 22, width: 22 }}/>
                 }
             }
         }
@@ -23,11 +23,11 @@ const AppNavigator = createBottomTabNavigator({
     YourMana: {
         screen: YourMana,
         navigationOptions: {
-            tabBarIcon: ({focused, tintColor}) => {
+            tabBarIcon: ({focused}) => {
                 if(focused == true){
-                    return <Image source={require(`./../../assets/your-active.png`)} style={{ height: 22, width: 22, tintColor: tintColor }}/>
+                    return <Image source={require(`./../../assets/your-active.png`)} style={{ height: 22, width: 22 }}/>
                 }else{
-                    return <Image source={require(`./../../assets/your.png`)} style={{ height: 22, width: 22, tintColor: tintColor }}/>
+                    return <Image source={require(`./../../assets/your.png`)} style={{ height: 22, width: 22 }}/>
                 }
             }
         }
@@ -35,11 +35,11 @@ const AppNavigator = createBottomTabNavigator({
     Goals: {
         screen: Goals,
         navigationOptions: {
-            tabBarIcon: ({focused, tintColor}) => {
+            tabBarIcon: ({focused}) => {
                 if(focused == true){
-                    return <Image source={require(`./../../assets/goal-active.png`)} style={{ height: 22, width: 22, resizeMode: 'contain', tintColor: tintColor }}/>
+                    return <Image source={require(`./../../assets/goal-active.png`)} style={{ height: 22, width: 22, resizeMode: 'contain'}}/>
                 }else{
-                    return <Image source={require(`./../../assets/goal.png`)} style={{ height: 22, width: 22, resizeMode: 'contain', tintColor: tintColor }}/>
+                    return <Image source={require(`./../../assets/goal.png`)} style={{ height: 22, width: 22, resizeMode: 'contain'}}/>
                 }
             }
         }
@@ -47,11 +47,11 @@ const AppNavigator = createBottomTabNavigator({
     Profile: {
         screen: Profile,
         navigationOptions: {
-            tabBarIcon: ({focused, tintColor}) => {
+            tabBarIcon: ({focused, navigation}) => {
                 if(focused == true){
-                    return <Image source={require(`./../../assets/profile-active.png`)} style={{ height: 22, width: 22, resizeMode: 'contain', tintColor: tintColor }}/>
+                    return <Image source={require(`./../../assets/profile-active.png`)} style={{ height: 22, width: 22, resizeMode: 'contain' }}/>
                 }else{
-                    return <Image source={require(`./../../assets/profile.png`)} style={{ height: 22, width: 22, resizeMode: 'contain', tintColor: tintColor }}/>
+                    return <Image source={require(`./../../assets/profile.png`)} style={{ height: 22, width: 22, resizeMode: 'contain' }}/>
                 }
             }
         }
@@ -64,6 +64,7 @@ const AppNavigator = createBottomTabNavigator({
         }
     }
 })
+
 
 const Appcontainer = createAppContainer(AppNavigator)
 export default Appcontainer;

@@ -14,7 +14,9 @@ class AddActivity extends Component{
     constructor(props) {
         super(props);
         this.state = {
-            date: ""
+            date: "",
+            title: "",
+            description: ""
         }
     }
 
