@@ -21,14 +21,16 @@ class ListActivity extends Component{
         super(props)
         this.state = {
           contentOffsetY: 0,
-          pagenum : 10,
-          scrollY: new Animated.Value(0)
+          limit : 10,
+          page : 1,
+          scrollY: new Animated.Value(0),
+          hasMore: true
         }
     }
 
-    async onReloadData(){
+    onReloadData = () => {
         AsyncStorage.getItem('token').then((response) => {
-            this.props.dispatch(getActivityUser(response, this.state.pagenum))
+            this.props.dispatch(getActivityUser(response, this.state.page, this.state.limit))
         })
     }
 
@@ -50,6 +52,14 @@ class ListActivity extends Component{
           });
           
           this.props.navigation.dispatch(navigateAction);
+    }
+
+    scrollActivityView(){
+        this.setState({
+            limit: this.state.limit + 5,
+            hasMore: (this.props.activitiesuser.others.limit == this.props.activitiesuser.others.total_record)
+        })
+        this.onReloadData()
     }
 
     componentWillMount(){
@@ -143,9 +153,10 @@ class ListActivity extends Component{
                     [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
                 {
                     listener: event => {
-                    const offsetY = event.nativeEvent.contentOffset.y
-                        if(offsetY < 0){
-                            this.onReloadData()
+                        var heightScroll = event.nativeEvent.contentSize.height
+                        var offset = event.nativeEvent.contentOffset.y
+                        if(height + offset >= this.state.hasMore){
+                            this.scrollActivityView()
                         }
                     },
                 },

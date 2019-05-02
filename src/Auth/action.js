@@ -17,13 +17,16 @@ export function login(email){
 }
 
 export function register(email, name, last_name){
+    const data = {
+        email: email,
+        first_name: name,
+        last_name: last_name,
+        notification: false
+    }
+
     return {
         type: 'POST_REGISTER',
-        payload: axios.post(`${baseUrl}user/regist`, {
-            email: email,
-            name: name,
-            last_name: last_name
-        }).then(function(response){
+        payload: axios.post(`${baseUrl}user/regist`, data).then(function(response){
             AsyncStorage.setItem('token', response.data.token)
             return response
         }).catch(function(error){

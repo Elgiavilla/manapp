@@ -11,6 +11,7 @@ import { StyleSheet, Text, View, Dimensions, ImageBackground, Image, TouchableOp
 import {connect} from 'react-redux'
 import { Icon, Form, Item, Input, Label, Button } from 'native-base'
 import {register} from './../action'
+import {StackActions, NavigationAction, NavigationActions} from 'react-navigation'
 
 const width = Dimensions.get('window').width
 const height = Dimensions.get('window').height

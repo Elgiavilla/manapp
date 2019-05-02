@@ -1,6 +1,6 @@
 const initialState = {
     isLoading: false,
-    data: []
+    data: {}
 }
 
 const AppReducers = (state = initialState, action) => {
@@ -22,6 +22,28 @@ const AppReducers = (state = initialState, action) => {
             }
         case 'GET_USER_FULFILLED': 
             return {
+                ...state,
+                data: action.payload.data,
+                isLoading: false
+            }
+        case 'UPDATE_USER_PENDING':
+            return{
+                ...state,
+                isLoading: true
+            }
+        case 'UPDATE_USER_FULFILLED':
+            return{
+                ...state,
+                data: action.payload.data,
+                isLoading: false
+            }
+        case 'UPDATE_SWITCH_USER_PENDING':
+            return{
+                ...state,
+                isLoading: true
+            }
+        case 'UPDATE_SWITCH_USER_FULFILLED':
+            return{
                 ...state,
                 data: action.payload.data,
                 isLoading: false

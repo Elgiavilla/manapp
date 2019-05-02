@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { baseUrl } from './../../baseurl'
 
-export function getActivityByUser(token){
+export function getActivityByUser(token, page, limit){
     const headers = {
         'Content-Type': 'application/json',
         'Auth': token
@@ -9,8 +9,9 @@ export function getActivityByUser(token){
 
     return{
         type: 'GET_ACTIVITY',
-        payload: axios.get(`${baseUrl}activity/user/today?num=10`, {headers})
+        payload: axios.get(`${baseUrl}activity/user/today?page=${page}&limit=${limit}`, {headers})
             .then(response => {
+                //console.log(response.records)
                 return response
             }).catch((error) => {
                 return error

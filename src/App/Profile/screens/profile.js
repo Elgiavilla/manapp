@@ -3,15 +3,13 @@ import { StyleSheet, View, Dimensions, ImageBackground, AsyncStorage } from 'rea
 import { ListItem, Text, Icon, Left, Body, Right, Switch } from 'native-base'
 import { connect } from 'react-redux'
 import { NavigationActions, StackActions } from 'react-navigation'
-import { logout, userData } from './../action'
-
+import { logout, userData, updateSwitch } from './../action'
 
 const width = Dimensions.get('window').width
 
 class ProfileDashboard extends Component{
-    state = {
-        switchNotif: false,
-        data: {}
+    constructor(props){
+        super(props)
     }
 
     handleLogout(){
@@ -24,14 +22,26 @@ class ProfileDashboard extends Component{
         })
     }
 
+
     componentDidMount(){
-        AsyncStorage.getItem('token').then((response) => {
-            this.props.dispatch(userData(response))
-        })
+        this.onReloadProfile()
     }
 
     onChangeFunction(newState){
-        this.setState(newState)
+        AsyncStorage.getItem('token').then((response) => {
+            const data1 = {
+                notification: true
+            }
+            this.props.dispatch(updateSwitch(response, newState.switchNotif)).then(() => {
+                this.onReloadProfile()
+            })
+        })
+    }
+
+    onReloadProfile(){
+        AsyncStorage.getItem('token').then((response) => {
+            this.props.dispatch(userData(response))
+        })
     }
 
     moveToEditProfile(){
@@ -43,7 +53,7 @@ class ProfileDashboard extends Component{
     }
 
     render(){
-        const { name } = this.props.profiles.data
+        const {first_name, notification} = this.props.profiles.data
         return(
             <View style={{flex: 1}}>
                 <View style={{zIndex: 0, position: 'absolute', width: width, height: 250, overflow: 'hidden', borderBottomLeftRadius: 30, borderBottomRightRadius: 30}}>
@@ -55,7 +65,7 @@ class ProfileDashboard extends Component{
                         </View>
                         <View style={{paddingTop: 20, justifyContent: 'center', alignItems: 'center'}}>
                             <Icon name="contact" style={{fontSize: 130, color: 'white'}}/>
-                            <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>{name}</Text>
+                            <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>{first_name}</Text>
                         </View>
                     </View>
                     </ImageBackground>
@@ -77,11 +87,11 @@ class ProfileDashboard extends Component{
                             <Text>Notification</Text>
                         </Body>
                         <Right>
-                            <Switch 
+                        <Switch 
                             onValueChange={(value => this.onChangeFunction({switchNotif: value}))} 
                             trackColor={{true: '#0062a8'}}
-                            value={this.state.switchNotif}
-                            />
+                            value={notification}
+                        />
                         </Right>
                     </ListItem>
                     <ListItem icon noBorder onPress={() => this.moveToAbout()}>

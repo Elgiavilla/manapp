@@ -9,7 +9,7 @@ export function getCountByUser(token){
 
     return{
         type: 'GET_COUNT_BY_USER',
-        payload: axios.get(`${baseUrl}activity/user/count/1`, {headers})
+        payload: axios.get(`${baseUrl}activity/user/count`, {headers})
             .then(response => {
                 return response
             }).catch(error => {

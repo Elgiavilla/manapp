@@ -8,6 +8,7 @@ import {Text, Spinner, Icon, Button
 } from 'native-base'
 
 const width = Dimensions.get('window').width
+const height = Dimensions.get('window').height
 
 const HEADER_MIN_HEIGHT = 70
 const HEADER_MAX_HEIGHT = 250
@@ -19,6 +20,9 @@ class Dashboard extends Component{
       
         this.state = {
           scrollY: new Animated.Value(0),
+          limit : 10,
+          page : 1,
+          hasMore : true
         };
     }
 
@@ -49,28 +53,35 @@ class Dashboard extends Component{
         })
     }
 
-    onReloadData(){
+    onReloadData = () => {
         AsyncStorage.getItem('token').then((response) => {
-            this.props.dispatch(getActivityByUser(response))
+            this.props.dispatch(getActivityByUser(response, this.state.page, this.state.limit))
         })
+    }
+
+    scrollReloadData(){
+        this.setState({
+            limit: this.state.limit + 10,
+            hasMore: (this.props.activities.others.limit == this.props.activities.others.total_record)
+        })
+        this.onReloadData()
     }
 
     componentDidMount(){
         this.onReloadData()
     }
 
-    _renderActivityView(){
-        return(
-            <View style={{flex: 1, marginTop: 200}}>
-                    <View style={{alignContent:'center', alignItems: 'center'}}>
-                        {this.props.activities.isLoading?(
-                            <View key={this.props.activities.isLoading} style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 200}}>
-                                <Spinner/>
-                            </View>
-                        ) : 
-                        (
-                        <View>
-                        {this.props.activities.data.map((item, index) => (
+    _renderActivityData(){
+        if (this.props.activities.data.length <= 0) {
+            return(
+                <View style={{paddingLeft: 20, paddingTop: 100, paddingBottom: 20}}>
+                    <Image style={{width: 50, height: 80, resizeMode: 'contain', justifyContent: 'center', alignItems: 'center', alignContent: 'center'}} source={require('./../../../../assets/Apixxxhdpi.png')}/>
+                </View>
+            )
+        } else {
+            return(
+                <View>
+                    {this.props.activities.data.map((item, index) => (
                         <View key={index} style={styles.customCard}>
                             <View style={{flexDirection: 'row'}}>
                                 <View style={{paddingLeft: 20, paddingTop: 40, paddingBottom: 20}}>
@@ -78,15 +89,15 @@ class Dashboard extends Component{
                                 </View>
                                 <View style={{paddingLeft: 30, flex: 1, paddingTop: 10, width: 190}}>
                                     <View style={{flex: 1}}>
-                                      <Text style={{fontWeight: 'bold'}}>{item.title}</Text>
-                                      <View style={{flexDirection: 'row', paddingTop: 10}}>
-                                       <View>
+                                    <Text style={{fontWeight: 'bold'}}>{item.title}</Text>
+                                    <View style={{flexDirection: 'row', paddingTop: 10}}>
+                                    <View>
                                             <Icon name="alarm" style={{color: '#0062a8'}}/>
-                                       </View>
-                                       <View style={{paddingLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
-                                         <Text style={{textAlign: 'center'}}>{item.time_end}</Text>
-                                       </View>
-                                      </View>
+                                    </View>
+                                    <View style={{paddingLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
+                                        <Text style={{textAlign: 'center'}}>{item.time_end}</Text>
+                                    </View>
+                                    </View>
                                     </View>
                                     <View style={{flexDirection: 'row', paddingTop: 10}}>
                                         
@@ -125,6 +136,23 @@ class Dashboard extends Component{
                             </View>
                         </View>
                         ))}
+                </View>
+            )
+        }
+    }
+
+    _renderActivityView(){
+        return(
+            <View style={{flex: 1, marginTop: 200}}>
+                    <View style={{alignContent:'center', alignItems: 'center'}}>
+                        {this.props.activities.isLoading?(
+                            <View key={this.props.activities.isLoading} style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 200}}>
+                                <Spinner/>
+                            </View>
+                        ) : 
+                        (
+                        <View>
+                            {this._renderActivityData()}
                         </View>
                         )}
                     </View>
@@ -180,7 +208,16 @@ class Dashboard extends Component{
             <ScrollView
                 scrollEventThrottle={1}
                 onScroll={Animated.event(
-                  [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}]
+                  [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}],
+                  {
+                    listener: event => {
+                        var heightScroll = event.nativeEvent.contentSize.height
+                        var offset = event.nativeEvent.contentOffset.y
+                        if(height + offset >= heightScroll && this.state.hasMore){
+                            this.scrollReloadData()
+                        }
+                    }
+                  }
                 )}
             >
             {this._renderActivityView()}

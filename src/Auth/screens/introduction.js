@@ -23,11 +23,12 @@ class Introduction extends Component {
         try {
            let value = await AsyncStorage.getItem('token');
            if (value != null){
-            const resetAction = StackActions.reset({
+              const resetAction = StackActions.reset({
                 index: 0,
                 actions: [NavigationActions.navigate({routeName: 'MainActivity'})]
               })
               this.props.navigation.dispatch(resetAction)
+            // AsyncStorage.removeItem('token')
            }
         } catch (error) {
           // Error retrieving data

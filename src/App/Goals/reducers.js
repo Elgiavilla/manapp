@@ -1,7 +1,8 @@
 const initialState = {
     isLoading: false,
     data: [],
-    results: {}
+    results: {},
+    others : {}
 }
 
 const AppReducers = (state = initialState, action) => {
@@ -14,7 +15,8 @@ const AppReducers = (state = initialState, action) => {
         case 'GET_ACTIVITY_USER_FULFILLED':
             return {
                 ...state,
-                data: action.payload.data,
+                data: action.payload.data.records,
+                others: action.payload.data,
                 isLoading: false
             }
         case 'GET_ACTIVITY_ID_PENDING': 

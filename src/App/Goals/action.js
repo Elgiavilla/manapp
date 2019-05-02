@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { baseUrl } from './../../baseurl'
 
-export function getActivityUser(token, num){
+export function getActivityUser(token, page, limit){
     const headers = {
         'Content-Type': 'application/json',
         'Auth': token
@@ -9,7 +9,7 @@ export function getActivityUser(token, num){
 
     return{
         type: 'GET_ACTIVITY_USER',
-        payload: axios.get(`${baseUrl}activity/user/1?num=${num}`, {headers})
+        payload: axios.get(`${baseUrl}activity/user?page=${page}&limit=${limit}`, {headers})
             .then(response => {
                 return response
             }).catch((error) => {

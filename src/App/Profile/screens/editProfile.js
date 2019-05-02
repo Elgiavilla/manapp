@@ -5,30 +5,39 @@ import { connect } from 'react-redux'
 const width = Dimensions.get("window").width
 const height = Dimensions.get("window").height
 
-import {userData} from './../action'
+import {userData, updateUser} from './../action'
 
 class Edit_profile extends Component{
     constructor(props) {
         super(props);
         this.state = {
             email: "",
-            name: "",
+            first_name: "",
             last_name: ""
         }
     }
 
     _updateProfile(){
-        const {email, name, last_name} = this.state
-        Alert.alert("Save", `${email} - ${name} - ${last_name}`)
+        AsyncStorage.getItem('token').then((response) => {
+            const {email, first_name, last_name} = this.state
+            const data = {
+                first_name: first_name,
+                last_name: last_name,
+                email: email
+            }
+            this.props.dispatch(updateUser(response, data)).then((resp) => {
+                Alert.alert('Success', 'Your profile has been updated')
+            })
+        })
     }
 
     componentDidMount(){
         AsyncStorage.getItem('token').then((response) => {
             this.props.dispatch(userData(response))
-            const {email, name, last_name} = this.props.profiles.data
+            const {email, first_name, last_name} = this.props.profiles.data
             this.setState({
                 email: email,
-                name: name,
+                first_name: first_name,
                 last_name: last_name
             })
         })
@@ -39,7 +48,7 @@ class Edit_profile extends Component{
     }
 
     render(){
-        const {email, name, last_name} = this.props.profiles.data
+        const {email, first_name, last_name} = this.props.profiles.data
         return(
             <View style={{flex: 1}}>
             <View style={{zIndex: 0, position: 'absolute', width: width, height: 250, overflow: 'hidden', borderBottomLeftRadius: 30, borderBottomRightRadius: 30}}>
@@ -58,7 +67,7 @@ class Edit_profile extends Component{
                         </View>
                         <View style={{paddingTop: 8, justifyContent: 'center', alignItems: 'center'}}>
                             <Icon name="contact" style={{fontSize: 130, color: 'white'}}/>
-                            <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>{name}</Text>
+                            <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>{first_name}</Text>
                         </View>
                     </View>
                 </ImageBackground>
@@ -70,7 +79,7 @@ class Edit_profile extends Component{
                             <Input placeholder='Email' value={this.state.email} onChangeText={(email) => this.setState({email})}/>
                         </Item>
                         <Item rounded style={styles.textInputStyle}>
-                            <Input placeholder='First Name' defaultValue={this.state.name} onChangeText={(name) => this.setState({name})}/>
+                            <Input placeholder='First Name' defaultValue={this.state.first_name} onChangeText={(first_name) => this.setState({first_name})}/>
                         </Item>
                         <Item rounded style={styles.textInputStyle}>
                             <Input placeholder='Last Name' defaultValue={this.state.last_name} onChangeText={(last_name) => this.setState({last_name})}/>

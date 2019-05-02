@@ -1,7 +1,7 @@
 const initialState = {
     isLoading: false,
     isLoggedIn: false,
-    data: []
+    data: {}
 }
 
 const authReducers  = (state = initialState, action) => {
@@ -27,8 +27,7 @@ const authReducers  = (state = initialState, action) => {
           return {
             ...state,
             data: action.payload.data,
-            isLoading: false,
-            isLoggedIn: true
+            isLoading: false
           }
         default :
             return state
