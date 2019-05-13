@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import{View, StyleSheet, Dimensions, Image, ImageBackground,TouchableOpacity, AsyncStorage, Alert} from 'react-native'
 import {Icon, Text, Content, Item, Input, Form} from 'native-base'
 import { connect } from 'react-redux'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 const width = Dimensions.get("window").width
 const height = Dimensions.get("window").height
 
@@ -51,6 +52,7 @@ class Edit_profile extends Component{
         const {email, first_name, last_name} = this.props.profiles.data
         return(
             <View style={{flex: 1}}>
+            <KeyboardAwareScrollView>
             <View style={{zIndex: 0, position: 'absolute', width: width, height: 250, overflow: 'hidden', borderBottomLeftRadius: 30, borderBottomRightRadius: 30}}>
                 <ImageBackground source={require('./../../../../assets/BGApp.png')}
                                 style={{width: width, height: 300, resizeMode: 'contain'}}>
@@ -94,6 +96,7 @@ class Edit_profile extends Component{
                     </View>
                 </View>
             </View>
+            </KeyboardAwareScrollView>
             </View>
         );
     }

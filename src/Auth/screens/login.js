@@ -7,9 +7,11 @@
  */
 
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, Dimensions, ImageBackground, Image, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, Alert,View, Dimensions, ImageBackground, Image, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import { connect } from 'react-redux'
 import {StackActions, NavigationAction, NavigationActions} from 'react-navigation'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
+import firebase from 'react-native-firebase'
 
 import { Icon, Form, Item, Input, Label, Button } from 'native-base'
 import { login } from './../action'
@@ -24,13 +26,42 @@ class Login extends Component {
 
   handleLogin(){
     const {email} = this.state
-    this.props.dispatch(login(email)).then((response) => {
-      const resetAction = StackActions.reset({
-        index: 0,
-        actions: [NavigationActions.navigate({routeName: 'MainActivity'})]
+    const enable = await firebase.messaging().hasPermission()
+    if(enable){
+      this.props.dispatch(login(email, this.getToken(), true)).then((response) => {
+        const resetAction = StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({routeName: 'MainActivity'})]
+        })
+        this.props.navigation.dispatch(resetAction)
       })
-      this.props.navigation.dispatch(resetAction)
-    })
+    }else{
+      try {
+        await firebase.messaging().requestPermission()
+        this.props.dispatch(login(email, this.getToken(), true)).then((response) => {
+          const resetAction = StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({routeName: 'MainActivity'})]
+          })
+          this.props.navigation.dispatch(resetAction)
+        })
+      } catch (error) {
+        this.props.dispatch(login(email, "", false)).then((response) => {
+          const resetAction = StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({routeName: 'MainActivity'})]
+          })
+          this.props.navigation.dispatch(resetAction)
+        })
+      }
+    }
+  }
+
+  async getToken(){
+    let fcmToken = await firebase.messaging().getToken()
+    if(fcmToken){
+      return fcmToken
+    }
   }
 
   moveBack(){
@@ -55,6 +86,7 @@ class Login extends Component {
                 <Text style={{color: 'white', fontSize: 15, fontWeight: 'bold'}}>Sign In</Text>
             </View>
           </View>
+          <KeyboardAwareScrollView>
           <View style={{flex: 1}}>
             <View style={{justifyContent: 'center', alignItems: 'center', marginTop: height / 3 - 190}}>
               <Image source={require('./../../../assets/Welcomexxxhdpi.png')} resizeMode={'contain'} style={{width: 200, height: 170}}/>
@@ -65,10 +97,10 @@ class Login extends Component {
             <View style={{flex: 1}}>
               <View style={{paddingTop: 10, width: width}}>
                 <Form style={{marginLeft: 20, marginRight: 30}}>
-                  <Item floatingLabel>
-                    <Label style={{color: 'white'}}>Email</Label>
-                    <Input style={{color: 'white'}} onChangeText={(email) => this.setState({email})}/>
-                  </Item>
+                    <Item floatingLabel>
+                      <Label style={{color: 'white'}}>Email</Label>
+                      <Input style={{color: 'white'}} onChangeText={(email) => this.setState({email})}/>
+                    </Item>
                 </Form>
               </View>
               <View style={{marginTop: 5, flex: 1}}>
@@ -96,6 +128,7 @@ class Login extends Component {
               </View>
             </View>
           </View>
+          </KeyboardAwareScrollView>
         </ImageBackground>
       </View>
     );

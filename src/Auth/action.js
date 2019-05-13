@@ -2,11 +2,13 @@ import {baseUrl} from './../baseurl'
 import axios from 'axios'
 import {Alert, AsyncStorage} from 'react-native'
 
-export function login(email){
+export function login(email, device_id, notification){
     return {
         type: 'POST_LOGIN',
         payload: axios.post(`${baseUrl}user/login`, {
-            email: email
+            email: email,
+            device_id: device_id,
+            notification: notification
         }).then(function(response){
             AsyncStorage.setItem('token', response.data.token)
             return response
@@ -16,12 +18,13 @@ export function login(email){
     }
 }
 
-export function register(email, name, last_name){
+export function register(email, name, last_name, notification, device_id){
     const data = {
         email: email,
         first_name: name,
         last_name: last_name,
-        notification: false
+        notification: notification,
+        device_id: device_id
     }
 
     return {

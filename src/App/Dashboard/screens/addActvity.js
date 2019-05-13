@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import{View, StyleSheet, Dimensions, Image, Alert, AsyncStorage,ImageBackground, TouchableOpacity} from 'react-native'
 import {Icon, Text, Item, Input, Form, Textarea} from 'native-base'
 import DatePicker from 'react-native-datepicker';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 
 import {connect} from 'react-redux'
 
@@ -59,6 +60,7 @@ class AddActivity extends Component{
     render(){
         return(
             <View style={{flex: 1}}>
+            <KeyboardAwareScrollView enableOnAndroid={true}>
             <View style={{zIndex: 0, position: 'absolute', width: width, height: 250, overflow: 'hidden', borderBottomLeftRadius: 30, borderBottomRightRadius: 30}}>
                 <ImageBackground source={require('./../../../../assets/BGApp.png')}
                                 style={{width: width, height: 300, resizeMode: 'contain'}}>
@@ -134,6 +136,7 @@ class AddActivity extends Component{
                     </Form>
                 </View>
             </View>
+            </KeyboardAwareScrollView>
             </View>
         );
     }

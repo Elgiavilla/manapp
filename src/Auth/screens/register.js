@@ -11,21 +11,69 @@ import { StyleSheet, Text, View, Dimensions, ImageBackground, Image, TouchableOp
 import {connect} from 'react-redux'
 import { Icon, Form, Item, Input, Label, Button } from 'native-base'
 import {register} from './../action'
-import {StackActions, NavigationAction, NavigationActions} from 'react-navigation'
+import {StackActions, NavigationActions} from 'react-navigation'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 
 const width = Dimensions.get('window').width
 const height = Dimensions.get('window').height
 class Register extends Component {
 
+  async checkPermission(){
+    const enable = await firebase.messaging().hasPermission()
+    if(enable){
+      return this.getToken()
+    }else{
+     return this.requestPermission()
+    }
+  }
+
+  async getToken(){
+    let fcmToken = await firebase.messaging().getToken()
+    if(fcmToken){
+      return fcmToken
+    }
+  }
+
+  async requestPermission(){
+    try {
+      await firebase.messaging().requestPermission()
+      this.getToken()
+    } catch (error) {
+      
+    }
+  }
+
   handleRegister(){
     const {email, name, last_name} = this.state
-    this.props.dispatch(register(email, name, last_name)).then((response) => {
-      const resetAction = StackActions.reset({
-        index: 0,
-        actions: [NavigationActions.navigate({routeName: 'MainActivity'})]
+    const enable = await firebase.messaging().hasPermission()
+    if(enable){
+      this.props.dispatch(register(email, name, last_name, true, this.getToken())).then((response) => {
+        const resetAction = StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({routeName: 'MainActivity'})]
+        })
+        this.props.navigation.dispatch(resetAction)
       })
-      this.props.navigation.dispatch(resetAction)
-    }) 
+    }else{
+      try {
+        await firebase.messaging().requestPermission()
+        this.props.dispatch(register(email, name, last_name, true, this.getToken())).then((response) => {
+          const resetAction = StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({routeName: 'MainActivity'})]
+          })
+          this.props.navigation.dispatch(resetAction)
+        })
+      } catch (error) {
+        this.props.dispatch(register(email, name, last_name, false, "")).then((response) => {
+          const resetAction = StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({routeName: 'MainActivity'})]
+          })
+          this.props.navigation.dispatch(resetAction)
+        })
+      }
+    }
   }
 
   moveBack(){
@@ -49,6 +97,7 @@ class Register extends Component {
                 <Text style={{color: 'white', fontSize: 15, fontWeight: 'bold'}}>Sign Up</Text>
             </View>
           </View>
+          <KeyboardAwareScrollView>
           <View style={{flex: 1, paddingTop: 5}}>
             <View style={{justifyContent: 'center', alignItems: 'center', marginTop: height / 3 - 220}}>
               <Image source={require('./../../../assets/Welcomexxxhdpi.png')} resizeMode={'contain'} style={{width: 200, height: 160}}/>
@@ -96,6 +145,7 @@ class Register extends Component {
               </View>
             </View>
           </View>
+          </KeyboardAwareScrollView>
         </ImageBackground>
       </View>
     );
